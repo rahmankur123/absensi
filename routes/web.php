@@ -17,9 +17,8 @@ Route::middleware(['auth', 'role:pelatih'])->get('/pelatih', [DashboardControlle
 Route::middleware(['auth', 'role:atlet'])->get('/atlet', [DashboardController::class, 'atlet']);
 
 
-Route::get('/', function () 
-{ return view('welcome')
-;});
+
+Route::get('/', [AuthController::class, 'login'])->name('login');
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'prosesLogin']);
 Route::get('/logout', [AuthController::class, 'logout']);
