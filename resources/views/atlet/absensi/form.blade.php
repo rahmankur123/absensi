@@ -18,7 +18,11 @@
     </ul>
 </div>
 @endif
-
+@if(session('error'))
+<div class="alert alert-danger">
+    {{ session('error') }}
+</div>
+@endif
 <form action="/atlet/absensi/{{ $data->id }}" 
       method="POST" 
       enctype="multipart/form-data">

@@ -51,6 +51,7 @@ class AtletDashboardController extends Controller
 
         $query = Kehadiran::with('absensi.jadwal')
             ->where('atlet_id', $atlet->id)
+            ->where('status', 'tidak_hadir')
             ->whereHas('absensi', function ($q) {
                 $q->where('status', 'buka');
             });
@@ -72,6 +73,7 @@ class AtletDashboardController extends Controller
     public function formAbsensi($id)
     {
         $user = Auth::user();
+        $kehadiran = Kehadiran::findOrFail($id);
         $atlet = $user->atlet;
 
         $data = Kehadiran::with('absensi.jadwal')
@@ -86,37 +88,36 @@ class AtletDashboardController extends Controller
     // SUBMIT ABSENSI
     // ===============================
     public function submitAbsensi(Request $request, $id)
-    {
-        $user = Auth::user();
-        $atlet = $user->atlet;
+{
+    $user = Auth::user();
+    $atlet = $user->atlet;
 
-        $data = Kehadiran::where('id', $id)
-            ->where('atlet_id', $atlet->id) // 🔥 security
-            ->firstOrFail();
+    $data = Kehadiran::where('id', $id)
+        ->where('atlet_id', $atlet->id)
+        ->firstOrFail();
 
-        // 🔥 cegah submit ulang
-        if ($data->status != null) {
-            return back()->with('error', 'Absensi sudah diisi');
-        }
-
-        $request->validate([
-            'status' => 'required|in:hadir,izin',
-            'bukti' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
-        ]);
-
-        // upload bukti (hadir & izin)
-        if (in_array($request->status, ['hadir', 'izin'])) {
-            if ($request->hasFile('bukti')) {
-                $path = $request->file('bukti')->store('bukti_absensi', 'public');
-                $data->bukti = $path;
-            }
-        }
-
-        $data->status = $request->status;
-        $data->save();
-
-        return redirect('/atlet/absensi')->with('success', 'Absensi berhasil dikirim');
+    // ✅ hanya blok kalau sudah diisi manual
+    if (in_array($data->status, ['hadir', 'izin'])) {
+        return back()->with('error', 'Absensi sudah diisi');
     }
+
+    $request->validate([
+        'status' => 'required|in:hadir,izin',
+        'bukti' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
+    ]);
+
+    // upload bukti
+    if ($request->hasFile('bukti')) {
+        $path = $request->file('bukti')->store('bukti_absensi', 'public');
+        $data->bukti = $path;
+    }
+
+    // update status
+    $data->status = $request->status;
+    $data->save();
+
+    return redirect('/atlet/absensi')->with('success', 'Absensi berhasil dikirim');
+}
 
     // ===============================
     // PROFIL
