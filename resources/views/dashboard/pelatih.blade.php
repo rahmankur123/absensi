@@ -10,8 +10,4 @@
 
 <hr>
 
-<h5>Menu</h5>
-<a href="#" class="btn btn-primary">Absensi</a>
-<a href="#" class="btn btn-warning">Evaluasi Atlet</a>
-
 @endsection
