@@ -16,7 +16,8 @@ class Atlet extends Model
         'jenis_kelamin',
         'alamat',
         'berat_badan',
-        'tinggi_badan'
+        'tinggi_badan',
+        'sabuk'
     ];
 
     public function user()

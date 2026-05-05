@@ -33,6 +33,7 @@
             <th>Email</th>
             <th>Jenis Kelamin</th>
             <th>No HP</th>
+            <th>Sabuk</th>
             <th width="200">Aksi</th>
         </tr>
     </thead>
@@ -44,6 +45,23 @@
             <td>{{ $d->user->email }}</td>
             <td>{{ $d->jenis_kelamin }}</td>
             <td>{{ $d->user->no_hp }}</td>
+            <td>
+    @if($d->sabuk == 'Putih')
+        <span class="badge bg-light text-dark">Putih</span>
+    @elseif($d->sabuk == 'Kuning')
+        <span class="badge bg-warning">Kuning</span>
+    @elseif($d->sabuk == 'Hijau')
+        <span class="badge bg-success">Hijau</span>
+    @elseif($d->sabuk == 'Biru')
+        <span class="badge bg-primary">Biru</span>
+    @elseif($d->sabuk == 'Coklat')
+        <span class="badge bg-secondary">Coklat</span>
+    @elseif($d->sabuk == 'Hitam')
+        <span class="badge bg-dark">Hitam</span>
+    @else
+        -
+    @endif
+</td>
             <td>
 
                 <a href="/admin/rekap-atlet/{{ $d->id }}" 

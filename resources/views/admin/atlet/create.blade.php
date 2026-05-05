@@ -45,6 +45,17 @@
 
         <label>Konfirmasi Password</label>
         <input type="password" name="password_confirmation" class="form-control mb-2">
+        
+        <label>Tingkatan Sabuk</label>
+        <select name="sabuk" class="form-control mb-2">
+            <option value="">Pilih Sabuk</option>
+            <option>Putih</option>
+            <option>Kuning</option>
+            <option>Hijau</option>
+            <option>Biru</option>
+            <option>Coklat</option>
+            <option>Hitam</option>
+        </select>
 
     </div>
 

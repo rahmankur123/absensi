@@ -38,7 +38,13 @@
 
                     {{-- LOGO --}}
                     <div class="text-center mb-3">
-                        <div class="logo">🏋️ BD Camp</div>
+                        <div class="text-center mb-2">
+    <img src="{{ asset('logo.jpg') }}" 
+         alt="BD Camp"
+         style="width:70px;">
+</div>
+
+<div class="logo text-center">BD Camp</div>
                         <small class="text-muted">Sistem Monitoring Atlet</small>
                     </div>
 

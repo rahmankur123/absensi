@@ -24,7 +24,15 @@
 </style>
 
 <div class="sidebar">
-    <h4 class="text-center py-3">BD Camp</h4>
+    <div class="d-flex justify-content-center align-items-center gap-2 px-3 py-3">
+    
+    <img src="{{ asset('logo.jpg') }}" 
+         alt="BD Camp"
+         style="width:40px; height:40px; object-fit:cover;">
+
+    <h5 class="mb-0 text-white fw-bold">BD Camp</h5>
+
+</div>
 
     {{-- ADMIN --}}
     @if($role == 'admin')

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Atlet;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class AtletController extends Controller
 {
@@ -53,6 +54,7 @@ public function store(Request $request)
         'password' => 'required|min:6|confirmed',
         'tanggal_lahir' => 'required|date',
         'alamat' => 'required',
+        'sabuk' => 'required',
         'berat_badan' => 'required|numeric',
         'tinggi_badan' => 'required|numeric',
         'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
@@ -81,7 +83,8 @@ public function store(Request $request)
         'alamat' => $data['alamat'],
         'berat_badan' => $data['berat_badan'],
         'tinggi_badan' => $data['tinggi_badan'],
-        'jenis_kelamin' => $data['jenis_kelamin']
+        'jenis_kelamin' => $data['jenis_kelamin'],
+        'sabuk' => $data['sabuk']
     ]);
 
     return redirect('/admin/atlet');
@@ -103,17 +106,23 @@ public function update(Request $request, $id)
 
     $data = $request->validate([
         'nama' => 'required',
-        'email' => 'required|email',
+        'email' => 'required|email|unique:users,email,' . $user->id,
         'tanggal_lahir' => 'required|date',
         'alamat' => 'required',
+        'sabuk' => 'required',
         'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
     ]);
 
     // upload foto baru
     if ($request->hasFile('foto')) {
-        $pathFoto = $request->file('foto')->store('foto_user', 'public');
-        $user->foto = $pathFoto;
+
+    if ($user->foto && Storage::disk('public')->exists($user->foto)) {
+        Storage::disk('public')->delete($user->foto);
     }
+
+    $pathFoto = $request->file('foto')->store('foto_atlet', 'public');
+    $user->foto = $pathFoto;
+}
 
     $user->update([
         'nama' => $data['nama'],
@@ -123,15 +132,16 @@ public function update(Request $request, $id)
 
     $atlet->update([
         'tanggal_lahir' => $data['tanggal_lahir'],
-        'alamat' => $data['alamat']
+        'alamat' => $data['alamat'],
+        'sabuk' => $data['sabuk']
     ]);
 
     return redirect('/admin/atlet');
 }
 public function delete($id)
 {
-    $atlet = Atlet::find($id);
-    $user = User::find($atlet->user_id);
+    $atlet = Atlet::findOrFail($id);
+    $user = User::findOrFail($atlet->user_id);
     $user->delete();
     $atlet->delete();
 

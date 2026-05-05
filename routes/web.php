@@ -72,17 +72,17 @@ Route::middleware(['auth','role:pelatih'])->prefix('pelatih')->group(function ()
 });
 
 Route::middleware(['auth','role:atlet'])->prefix('atlet')->group(function () {
-    Route::get('/riwayat', [AtletDashboardController::class, 'riwayat']);
+    Route::get('/riwayat', [AtletDashboardController::class, 'riwayat'])->name('atlet.riwayat');
 
-    Route::get('/absensi', [AtletDashboardController::class, 'absensi']);
-    Route::get('/absensi/{id}', [AtletDashboardController::class, 'formAbsensi']);
-    Route::post('/absensi/{id}', [AtletDashboardController::class, 'submitAbsensi']);
+    Route::get('/absensi', [AtletDashboardController::class, 'absensi'])->name('atlet.absensi');
+    Route::get('/absensi/{id}', [AtletDashboardController::class, 'formAbsensi'])->name('atlet.absensi.form');
+    Route::post('/absensi/{id}', [AtletDashboardController::class, 'submitAbsensi'])->name('atlet.absensi.submit');
 
-    Route::get('/profil', [AtletDashboardController::class, 'profil']);
-    Route::post('/profil/update', [AtletDashboardController::class, 'updateProfil']);
+    Route::get('/profil', [AtletDashboardController::class, 'profil'])->name('atlet.profil');
+    Route::post('/profil/update', [AtletDashboardController::class, 'updateProfil'])->name('atlet.profil.update');
 
-    Route::get('/jadwal', [AtletDashboardController::class, 'jadwal']);
-    
+    Route::get('/jadwal', [AtletDashboardController::class, 'jadwal'])->name('atlet.jadwal');
+
     Route::get('/prestasi', [PrestasiController::class, 'index']);
     Route::get('/prestasi/create', [PrestasiController::class, 'create']);
     Route::post('/prestasi/store', [PrestasiController::class, 'store']);

@@ -66,6 +66,15 @@
         <label>Alamat</label>
         <textarea name="alamat" class="form-control mb-2">{{ $data->alamat }}</textarea>
 
+        <select name="sabuk" class="form-control mb-2">
+            @foreach(['Putih','Kuning','Hijau','Biru','Coklat','Hitam'] as $s)
+                <option value="{{ $s }}" 
+                    {{ $data->sabuk == $s ? 'selected' : '' }}>
+                    {{ $s }}
+                </option>
+            @endforeach
+        </select>
+
     </div>
 
 </div>

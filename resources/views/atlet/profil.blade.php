@@ -111,6 +111,22 @@
         @endif
     </div>
 
+    <div class="col-md-12 mb-3">
+        <label>Sabuk</label>
+        @if($mode == 'edit')
+            <select name="sabuk" class="form-control">
+                <option value="Putih" {{ $atlet->sabuk=='Putih'?'selected':'' }}>Putih</option>
+                <option value="Kuning" {{ $atlet->sabuk=='Kuning'?'selected':'' }}>Kuning</option>
+                <option value="Hijau" {{ $atlet->sabuk=='Hijau'?'selected':'' }}>Hijau</option>
+                <option value="Biru" {{ $atlet->sabuk=='Biru'?'selected':'' }}>Biru</option>
+                <option value="Coklat" {{ $atlet->sabuk=='Coklat'?'selected':'' }}>Coklat</option>
+                <option value="Hitam" {{ $atlet->sabuk=='Hitam'?'selected':'' }}>Hitam</option>
+            </select>
+        @else
+            <div class="form-control bg-light">{{ $atlet->sabuk }}</div>
+        @endif
+    </div>
+
 </div>
 
 <div class="text-end">

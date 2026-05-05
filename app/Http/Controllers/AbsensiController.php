@@ -60,8 +60,7 @@ class AbsensiController extends Controller
         ]);
     }
 
-    return redirect()->route('pelatih.absensi.index')
-        ->with('success', 'Absensi berhasil dibuat');
+    return redirect('/pelatih/absensi')->with('success', 'Absensi berhasil dibuat');
 }
 
     public function detail(Request $request, $id)
