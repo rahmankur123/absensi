@@ -13,79 +13,206 @@ use Carbon\Carbon;
 class DashboardController extends Controller
 {
 
+
 public function admin()
 {
     $name = Auth::user()->name;
+
     $totalAtlet = Atlet::count();
     $totalLatihan = Absensi::count();
     $totalPrestasi = Prestasi::count();
 
-    // bulan ini
+    // BULAN INI
     $bulan = Carbon::now()->month;
     $tahun = Carbon::now()->year;
 
-    $hadir = Kehadiran::where('status','hadir')
-        ->whereHas('absensi', function($q) use ($bulan,$tahun){
-            $q->whereMonth('tanggal',$bulan)
-              ->whereYear('tanggal',$tahun);
-        })->count();
+    $hadir = Kehadiran::where('status', 'hadir')
+        ->whereHas('absensi', function ($q) use ($bulan, $tahun) {
+            $q->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+        })
+        ->count();
 
-    $tidak = Kehadiran::where('status','tidak_hadir')->count();
+    $tidak = Kehadiran::where('status', 'tidak_hadir')
+        ->whereHas('absensi', function ($q) use ($bulan, $tahun) {
+            $q->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+        })
+        ->count();
 
-    $recentAbsensi = Absensi::latest()->take(5)->get();
+    $izin = Kehadiran::where('status', 'izin')
+        ->whereHas('absensi', function ($q) use ($bulan, $tahun) {
+            $q->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+        })
+        ->count();
+
+    // RECENT ABSENSI
+    $recentAbsensi = Absensi::with(['jadwal', 'kehadiran'])
+        ->latest()
+        ->take(5)
+        ->get()
+        ->map(function ($item) {
+
+            $item->hadir = $item->kehadiran
+                ->where('status', 'hadir')
+                ->count();
+
+            $item->izin = $item->kehadiran
+                ->where('status', 'izin')
+                ->count();
+
+            $item->tidak = $item->kehadiran
+                ->where('status', 'tidak_hadir')
+                ->count();
+
+            return $item;
+        });
 
     return view('dashboard.admin', compact(
-        'totalAtlet','totalLatihan','totalPrestasi',
-        'hadir','tidak','recentAbsensi', 'name'
+        'totalAtlet',
+        'totalLatihan',
+        'totalPrestasi',
+        'hadir',
+        'tidak',
+        'izin',
+        'recentAbsensi',
+        'name'
     ));
 }
 
 public function pelatih()
 {
+    $name = Auth::user()->name;
+
     $totalAtlet = Atlet::count();
     $totalLatihan = Absensi::count();
+    $totalPrestasi = Prestasi::count();
 
-    $today = Carbon::today();
+    // BULAN INI
+    $bulan = Carbon::now()->month;
+    $tahun = Carbon::now()->year;
 
-    $absensiHariIni = Absensi::whereDate('tanggal',$today)->first();
+    $hadir = Kehadiran::where('status', 'hadir')
+        ->whereHas('absensi', function ($q) use ($bulan, $tahun) {
+            $q->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+        })
+        ->count();
 
-    $hadirHariIni = 0;
+    $tidak = Kehadiran::where('status', 'tidak_hadir')
+        ->whereHas('absensi', function ($q) use ($bulan, $tahun) {
+            $q->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+        })
+        ->count();
 
-    if ($absensiHariIni) {
-        $hadirHariIni = Kehadiran::where('absensi_id',$absensiHariIni->id)
-            ->where('status','hadir')
-            ->count();
-    }
+    $izin = Kehadiran::where('status', 'izin')
+        ->whereHas('absensi', function ($q) use ($bulan, $tahun) {
+            $q->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+        })
+        ->count();
 
-    $recent = Absensi::latest()->take(5)->get();
+    // RECENT ABSENSI
+    $recentAbsensi = Absensi::with(['jadwal', 'kehadiran'])
+        ->latest()
+        ->take(5)
+        ->get()
+        ->map(function ($item) {
+
+            $item->hadir = $item->kehadiran
+                ->where('status', 'hadir')
+                ->count();
+
+            $item->izin = $item->kehadiran
+                ->where('status', 'izin')
+                ->count();
+
+            $item->tidak = $item->kehadiran
+                ->where('status', 'tidak_hadir')
+                ->count();
+
+            return $item;
+        });
 
     return view('dashboard.pelatih', compact(
-        'totalAtlet','totalLatihan','absensiHariIni','hadirHariIni','recent'
+        'totalAtlet',
+        'totalLatihan',
+        'totalPrestasi',
+        'hadir',
+        'tidak',
+        'izin',
+        'recentAbsensi',
+        'name'
     ));
 }
+
 public function atlet()
 {
-    $user = auth()->user();
-    $atlet = $user->atlet;
+    $name = Auth::user()->name;
 
-    $totalLatihan = Kehadiran::where('atlet_id',$atlet->id)->count();
+    $atlet = Atlet::where('user_id', Auth::id())->first();
 
-    $hadir = Kehadiran::where('atlet_id',$atlet->id)
-        ->where('status','hadir')->count();
+    // TOTAL LATIHAN MILIK ATLET
+    $totalLatihan = Kehadiran::where('atlet_id', $atlet->id)->count();
 
-    $izin = Kehadiran::where('atlet_id',$atlet->id)
-        ->where('status','izin')->count();
+    // BULAN INI
+    $bulan = Carbon::now()->month;
+    $tahun = Carbon::now()->year;
 
-    $prestasi = Prestasi::where('atlet_id',$atlet->id)->count();
+    // HADIR
+    $hadir = Kehadiran::where('atlet_id', $atlet->id)
+        ->where('status', 'hadir')
+        ->whereHas('absensi', function ($q) use ($bulan, $tahun) {
 
+            $q->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+
+        })
+        ->count();
+
+    // TIDAK HADIR
+    $tidak = Kehadiran::where('atlet_id', $atlet->id)
+        ->where('status', 'tidak_hadir')
+        ->whereHas('absensi', function ($q) use ($bulan, $tahun) {
+
+            $q->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+
+        })
+        ->count();
+
+    // IZIN
+    $izin = Kehadiran::where('atlet_id', $atlet->id)
+        ->where('status', 'izin')
+        ->whereHas('absensi', function ($q) use ($bulan, $tahun) {
+
+            $q->whereMonth('tanggal', $bulan)
+              ->whereYear('tanggal', $tahun);
+
+        })
+        ->count();
+
+    // PRESTASI
+    $prestasi = Prestasi::where('atlet_id', $atlet->id)->count();
+
+    // RIWAYAT LATIHAN
     $recent = Kehadiran::with('absensi')
-        ->where('atlet_id',$atlet->id)
+        ->where('atlet_id', $atlet->id)
+        ->whereHas('absensi')
         ->latest()
         ->take(5)
         ->get();
 
     return view('dashboard.atlet', compact(
-        'totalLatihan','hadir','izin','prestasi','recent'
+        'totalLatihan',
+        'hadir',
+        'tidak',
+        'izin',
+        'prestasi',
+        'recent',
+        'name'
     ));
 }
 }

@@ -1,4 +1,4 @@
-<div class="bg-white shadow-sm px-4 py-3 d-flex justify-content-between align-items-center">
+<div class="d-flex justify-content-between align-items-center">
 
     {{-- TITLE --}}
     <div>
@@ -10,9 +10,6 @@
 
     {{-- USER --}}
     <div class="d-flex align-items-center gap-3">
-
-        {{-- NOTIF (OPSIONAL) --}}
-        <span style="font-size:18px;">🔔</span>
 
         {{-- FOTO --}}
         @if(Auth::user()->foto)
